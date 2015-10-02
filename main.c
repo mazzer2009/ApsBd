@@ -12,24 +12,34 @@
 typedef struct campo Campo;
 typedef struct tabela Tabela;
 
-struct campo{
+struct campo {
     char*nome;
     int tipo;
 };
 
-struct tabela{
+struct tabela {
     char* nome;
     Campo** campo;
 };
 
-
-void inicializarArq(char* nome){
-    FILE *fp=fopen(nome,"wr");
-    char t=0;
-    fwrite(&t,2000,1,fp); 
-} 
-
-
+void inicializarArq(char* nome) {
+    FILE *fp = fopen(nome, "wr");
+    int t = 0; 
+    int i = 0;
+    
+     if (!fp) {// Se não conseguiu criar
+        printf("Problemas na CRIACAO do arquivo\n");
+   	return;
+    }
+    
+    while (i < 500) {
+    printf("aqui %d", i);
+        fwrite(&t, sizeof(int), 1, fp);
+        i++;
+    }
+    fclose(fp);
+    
+}
 
 int lerArquivo(char *arquivo) {
     FILE* p = fopen(arquivo, "rw");
@@ -44,7 +54,7 @@ int lerArquivo(char *arquivo) {
             if (!(strcasecmp(token, "TABLE"))) {
                 nome = nextToken(t);
                 //fgets()
-                
+
 
                 printf("%s\n", nome);
             }
@@ -56,7 +66,74 @@ int lerArquivo(char *arquivo) {
 
 }
 
+int inserirRegistros(char *arquivo) {
+    FILE* p = fopen(arquivo, "rw");
+    TokenReader *t;
+    char *token;
+    char *nome;
+    char values[1000];
+    
+   
 
+    fgets(values, sizeof (values), p);
+    t = newTokenReader(values);
+    while (!(strcasecmp(token, "INTO"))) {
+        token = nextToken(t);
+
+    }
+    nome = nextToken(t);
+
+    //    getTable(nome);
+
+
+    while ((fgets(values, sizeof (values), p)) != NULL) {
+        t = newTokenReader(values);
+        while (hasMoreTokens(t)) {
+
+
+            if (!(strcasecmp(token, "values"))) {
+
+            }
+
+        }
+    }
+}
+
+struct Tabela* getTabela(char *arquivo) {
+    char *arq = arquivo;
+    strcat(arq, ".dat");
+    printf("Nome arquivo: %s", arq);
+    FILE* p = fopen(arq, "rb");
+
+    if (!p) {
+        printf("Erro na abertura do arquivo");
+        return -1;
+    }
+    Tabela *t = (Tabela*) malloc(sizeof (Tabela));
+    t->nome = arq;
+    Campo *c = (Campo*) malloc(sizeof (Campo));
+    //criar laço para ler ate o fim do cabeçalho
+}
+
+int gravaArquivoCreate(Tabela *t) {
+    char *arq = t->nome;
+    strcat(arq, ".dat");
+    FILE *f = fopen(arq, "wb"); // Cria um arquivo binário para gravação 
+
+    if (!f) // Se não conseguiu criar
+    {
+        printf("Problemas na CRIACAO do arquivo\n");
+        return -1;
+    }
+
+    fwrite(0, sizeof (int), 0, f);
+    fwrite(0, sizeof (int), 4, f);
+    fwrite(0, sizeof (int), 2000, f);
+    fwrite(0, sizeof (int), 2000, f);
+
+    fclose(f);
+
+}
 
 int main(int argc, char** argv) {
     int op = -1;
@@ -70,7 +147,6 @@ int main(int argc, char** argv) {
     //
     //    }
 
-    //inicializarArq("teste.bin");
     do {
         printf("|---------------------|\n"
                 "|1 - Criar Arquivo    |\n"
@@ -90,10 +166,14 @@ int main(int argc, char** argv) {
                 lerArquivo(nome);
                 break;
             case 2:
-                //inserirRegistros();
+                printf("Informe o nome do arquivo: ");
+                char *nomea;
+                scanf("%s", nomea);
+                inserirRegistros(nomea);
                 break;
             case 3:
                 //listarRegistros();
+                inicializarArq("teste.dat");
                 break;
             case 4:
                 //excluirRegistros();
